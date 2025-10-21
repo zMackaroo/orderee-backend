@@ -1,5 +1,5 @@
 export default (sequelize, DataTypes) => {
-  const Menu = sequelize.define('Menu', {
+  const Client = sequelize.define('Client', {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
@@ -14,19 +14,29 @@ export default (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false
     },
-    price: {
-      type: DataTypes.FLOAT,
+    email: {
+      type: DataTypes.STRING,
       allowNull: false
     },
-    client_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      field: 'client_id'
+    contact_number: {
+      type: DataTypes.STRING,
+      allowNull: false
     },
-    category_id: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-      field: 'category_id'
+    address: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    branch: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    username: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    password: {
+      type: DataTypes.STRING,
+      allowNull: false
     },
     active: {
       type: DataTypes.BOOLEAN,
@@ -50,18 +60,22 @@ export default (sequelize, DataTypes) => {
       field: 'deletedAt'
     }
   }, {
-    tableName: 'menus',
+    tableName: 'clients',
     timestamps: true,
     paranoid: true,
     underscored: false
   });
 
-  Menu.associate = (models) => {
-    Menu.belongsTo(models.Category, {
-      foreignKey: 'category_id',
-      as: 'category'
-   });
+  Client.associate = (models) => {
+   //  Client.belongsTo(models.Client, {
+   //    foreignKey: 'client_id',
+   //    as: 'client'
+   // });
+   //  Client.belongsTo(models.Client, {
+   //    foreignKey: 'client_id',
+   //    as: 'client'
+   // });
   };
 
-  return Menu;
+  return Client;
 };

@@ -11,6 +11,45 @@ export default class BaseController {
         this.model = model;
     }
 
+    /**
+     * @description Build nested includes
+     * @param {*} model
+     * @param {number} depth
+     * @param {Set} visited
+     * @returns Array of include objects
+     */
+    deepAssociate(model, depth = 2, visited = new Set()) {
+        if(depth <= 0 || !model.associations) return [];
+        const modelName = model.name;
+
+        if(visited.has(modelName)) return [];
+        visited.add(modelName);
+        const d = [];
+
+        for(const key of Object.keys(model.associations)) {
+            const association = model.associations[key];
+            const associatedModel = association.target;
+
+            const data = {
+                association: key,
+                required: false,
+            };
+
+            const associates = this.deepAssociate(
+                associatedModel,
+                depth - 1,
+                new Set(visited)
+            );
+
+            if(associates.length > 0)
+               data.include = associates;
+
+            d.push(data);
+        }
+
+        return d;
+    }
+
 
     /**
      * @description Create a new record
@@ -36,7 +75,16 @@ export default class BaseController {
      */
    find = async (req, res) => {
       try {
-         const data = await this.model.findAll();
+         const include = req.query.include !== 'false';
+         const depth = Math.min(parseInt(req.query.depth) || 2, 5);
+
+         const options = {};
+
+         if(include && this.model.associations) {
+            options.include = this.deepAssociate(this.model, depth);
+         }
+
+         const data = await this.model.findAll(options);
          return this.response({
             data,
             count: data.length,
@@ -55,9 +103,23 @@ export default class BaseController {
      */
     findOne = async (req, res) => {
         try {
-            return this.response({
-               message: 'Success'
-            }, null, res);
+            const includeRelations = req.query.include !== 'false';
+            const depth = Math.min(parseInt(req.query.depth) || 2, 5);
+            const { where } = req.query;
+
+            const options = { where: where || {} };
+
+            if (includeRelations && this.model.associations) {
+               options.include = this.deepAssociate(this.model, depth);
+            }
+
+            const data = await this.model.findOne(options);
+
+            if (!data) {
+               return this.response(null, { message: 'Record not found' }, res);
+            }
+
+            return this.response({ data }, null, res);
         } catch (error) {
             this.response(null, error, res);
         }
@@ -72,9 +134,23 @@ export default class BaseController {
      */
     findById = async (req, res) => {
         try {
-            return this.response({
-               message: 'Success'
-            }, null, res);
+            const includeRelations = req.query.include !== 'false';
+            const depth = Math.min(parseInt(req.query.depth) || 2, 5);
+            const { id } = req.params;
+
+            const options = { where: { id } };
+
+            if (includeRelations && this.model.associations) {
+               options.include = this.deepAssociate(this.model, depth);
+            }
+
+            const data = await this.model.findOne(options);
+
+            if (!data) {
+               return this.response(null, { message: 'Record not found' }, res);
+            }
+
+            return this.response({ data }, null, res);
         } catch (error) {
             this.response(null, error, res);
         }

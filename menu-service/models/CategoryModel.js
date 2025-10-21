@@ -1,10 +1,13 @@
 export default (sequelize, DataTypes) => {
-  const Menu = sequelize.define('Menu', {
+  const Category = sequelize.define('Category', {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
       allowNull: false
+    },
+    client_id: {
+      type: DataTypes.INTEGER,
     },
     name: {
       type: DataTypes.STRING,
@@ -13,20 +16,6 @@ export default (sequelize, DataTypes) => {
     description: {
       type: DataTypes.STRING,
       allowNull: false
-    },
-    price: {
-      type: DataTypes.FLOAT,
-      allowNull: false
-    },
-    client_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      field: 'client_id'
-    },
-    category_id: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-      field: 'category_id'
     },
     active: {
       type: DataTypes.BOOLEAN,
@@ -50,18 +39,18 @@ export default (sequelize, DataTypes) => {
       field: 'deletedAt'
     }
   }, {
-    tableName: 'menus',
+    tableName: 'categories',
     timestamps: true,
     paranoid: true,
     underscored: false
   });
 
-  Menu.associate = (models) => {
-    Menu.belongsTo(models.Category, {
-      foreignKey: 'category_id',
-      as: 'category'
+  Category.associate = (models) => {
+    Category.belongsTo(models.Client, {
+      foreignKey: 'client_id',
+      as: 'client'
    });
   };
 
-  return Menu;
+  return Category;
 };
