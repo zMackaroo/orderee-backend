@@ -10,10 +10,6 @@ export default (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false
     },
-    description: {
-      type: DataTypes.STRING,
-      allowNull: false
-    },
     email: {
       type: DataTypes.STRING,
       allowNull: false
@@ -36,7 +32,8 @@ export default (sequelize, DataTypes) => {
     },
     password: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: false,
+
     },
     active: {
       type: DataTypes.BOOLEAN,
@@ -63,7 +60,15 @@ export default (sequelize, DataTypes) => {
     tableName: 'clients',
     timestamps: true,
     paranoid: true,
-    underscored: false
+    underscored: false,
+    defaultScope: {
+      attributes: { exclude: ['password'] }
+    },
+    scopes: {
+      withPassword: {
+        attributes: { include: ['password'] }
+      }
+    }
   });
 
   Client.associate = (models) => {
