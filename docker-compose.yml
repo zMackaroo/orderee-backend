@@ -1,0 +1,40 @@
+version: "3.9"
+
+services:
+  company:
+    build: ./company
+    container_name: company-service
+    ports:
+      - "5003:5003"
+    env_file:
+      - ./envs/env
+    networks:
+      - orderee-network
+    restart: always
+
+  menu:
+    build: ./menu
+    container_name: menu-service
+    ports:
+      - "5001:5001"
+    env_file:
+      - ./envs/env
+    networks:
+      - orderee-network
+    restart: always
+
+  ordering:
+    build: ./ordering
+    container_name: ordering-service
+    ports:
+      - "5002:5002"
+    env_file:
+      - ./envs/env
+    networks:
+      - orderee-network
+    restart: always
+
+networks:
+  orderee-network:
+    driver: bridge
+    
