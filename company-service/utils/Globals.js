@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { PUBLIC_API } from '../constants/index.js';
+import db from '../models/index.js';
 
 /**
  *
@@ -18,7 +19,6 @@ export default class Globals {
     static async routerMiddleware(req, res, next) {
         const err = { message: 'Unauthorized' };
 
-        // Try to get token from cookie first, fallback to Authorization header
         let token = req.cookies?.auth_token;
 
         if(!token) {
@@ -38,9 +38,12 @@ export default class Globals {
                 return res.status(401).json(err);
             }
 
-            // Store user ID in request for use in controllers
-            req.userId = decoded.userId;
-            req.user = { id: decoded.userId };
+            const user = await db.Client.findByPk(decoded.userId);
+            if(!user) {
+                return res.status(401).json(err);
+            }
+
+            req.user = user;
 
             next();
         } catch (error) {
